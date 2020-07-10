@@ -5,15 +5,18 @@ const mongoose = require('mongoose'),
 // Create a schema
 const _schema = new Schema({
 	email: String,
+	fname: String,
+	lname: String,
+	password: String,
+	roles: Array,
 	token: String,
-	token_created: Date,
 	updated: Date,
 	created: { type: Date, default: Date.now}
 });
 
 
 // Create the model
-const model = mongoose.model('users', _schema);
+const model = mongoose.model('agents', _schema);
 
 
 // Export the model

@@ -5,6 +5,7 @@ const mongoose = require('mongoose'),
 // Create a schema
 const _schema = new Schema({
 	user_id: String,
+	role: String,
 	last_entry: { type: Date, default: Date.now}
 });
 
