@@ -112,6 +112,11 @@ module.exports = {
 
 		let ticketId = req.params.ticket_id;
 
+		let comment = isRequred(req.body, 'comment');
+		if (comment !== false){
+			if (typeof(comment) !== 'string') errs.push({field: "comment", err: "type"})
+		} else errs.push({field: "comment", err: "required"});
+
 		if (errs.length > 0) {
 			return res.json({
 				status: false,
@@ -120,9 +125,35 @@ module.exports = {
 		}
 
 		// Confirm ticket exists and user is the owner
-		tickets.findOne({id: ticketId}, (err, ticket) => {
+		tickets.findOne({_id: ticketId}, (err, ticket) => {
 			if (!err) {
 				if (ticket) {
+
+					// Confirm that this user is the owner
+					if (ticket.agent_id == req.app.locals.userId) {
+
+						// upate the ticket
+						let data = {
+							remark: comment,
+							date_closed: new Date()
+						}
+						tickets.updateOne({_id: ticket._id}, {$set: data}, (err, status) => {
+							if (!err) {
+								res.json({
+									status: true
+								})
+							} else {
+								log(err);
+								res.json({
+									status: false
+								})
+							}
+						})
+
+					} else res.json({
+						status: false,
+						err: "no-access"
+					})
 
 				} else {
 					res.json({

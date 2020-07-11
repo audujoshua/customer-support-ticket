@@ -25,6 +25,7 @@ router.get('/agent/auth/token/:token', agents.auth.checkToken);
 router.post('/agent/auth/login', agents.auth.login);
 router.put('/agent/ticket/:ticket_id/assign', hasSession, agents.tickets.claim);
 router.post('/agent/ticket/:ticket_id/comment', hasSession, agents.tickets.addComment);
+router.put('/agent/ticket/:ticket_id/close', hasSession, agents.tickets.close);
 
 // Admin Routes
 router.post('/admin/login', admin.auth.login);

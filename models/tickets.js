@@ -16,6 +16,7 @@ const _schema = new Schema({
 	text: String,
 	date_assigned: Date,
 	date_closed: Date,
+	remark: String,
 	comments: Array,
 	created: { type: Date, default: Date.now}
 });
