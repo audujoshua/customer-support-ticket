@@ -1,5 +1,5 @@
-const appConst = require ('./constants'),
-    sessions = require('../models/sessions.js');
+const appConst = require ('./constants');
+const sessions = require('../models/sessions.js');
 
 
 
@@ -47,7 +47,7 @@ function checkHeader(req, callBack){
     } else callBack(false);
 }
 
-// Reset the last date the service was accessed using the attached cookie
+// Reset the last date the service was accessed using the attached header
 function updateSession(sessionId, callBack){
     let dt = new Date();
     let mth = ((dt.getMonth() + 1) < 10 ? '0' : '') + (dt.getMonth() + 1);

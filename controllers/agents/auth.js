@@ -1,12 +1,15 @@
 const validator = require('validator');
 const agents = require("../../models/agents");
 const isRequred = require('../../components/is-required');
-const hasher = require('../../components/hash.js'),
+const hasher = require('../../components/hash.js');
+const appConst = require('../../components/constants');
+const {checkHeader, createSession} = require('../../components/session');
+
 
 module.exports = {
 
-	// Sets password for user
-	setPassword: (req, res) => {
+	// Updates password for user
+	updatePassword: (req, res) => {
 
 		// Validate input
 		let errs = [];
@@ -37,11 +40,11 @@ module.exports = {
 
 
 		// confirm that the password has not been set
-		_isPasswordEmpty(token, (err, agentId) => {
-			if (agentId) {
+		_validateToken(token, (err, agentId) => {
+			if (!err) {
 
-				// Set the password
-				agents.updateOne({_id: agentId}, {$set: {password, updated: new Date()}}, (err, status) => {
+				// Update the password and clear the token.
+				agents.updateOne({_id: agentId}, {$set: {password: hasher(password), token: '', updated: new Date()}}, (err, status) => {
 					if (!err) {
 						res.json({
 							status: true
@@ -49,31 +52,28 @@ module.exports = {
 					} else {
 						log(err);
 						res.json({
-							status: false,
-							msg: "Error on DB update"
+							status: false
 						})
 					}
 				})
-
 			} else {
+				log(token + " " + err);
 				res.json({
 					status: false,
-					err: "password-set"
+					err: "invalid-token"
 				})
 			}
 		})
 	},
 
 	// Check if password is already set.
-	isPasswordSet: (req, res) => {
+	checkToken: (req, res) => {
 
 		// Validate input
 		let errs = [];
 
-		let token = isRequred(req.body, 'token');
-		if (token !== false){
-			if (typeof(token) !== 'string') errs.push({field: "token", err: "type"})
-		} else errs.push({field: "token", err: "required"});
+		let token = req.params.token;
+		if (typeof(token) !== 'string') errs.push({field: "token", err: "type"})
 
 		if (errs.length > 0) {
 			return res.json({
@@ -82,19 +82,20 @@ module.exports = {
 			})
 		}
 
-		_isPasswordEmpty(token, (err, pStatus) => {
+		_validateToken(token, (err, pStatus) => {
 			if (!err) {
 				res.json({
-					status: pStatus ? false : true
+					status: true
 				})
 			} else {
-				log(err);
+				log(token + " " + err);
 				res.json({
-					status: false
+					status: false,
+					err
 				})
 			}
 		})
-	}
+	},
 
 	// Login
 	login: (req, res) => {
@@ -123,6 +124,7 @@ module.exports = {
 		agents.findOne({email: email}, (err, agent) => {
 			if (!err) {
 				if (agent) {
+
 					if (agent.password == hasher(password)) {
 
 						// If the request comes with a header, check it's validity and continue with session
@@ -150,7 +152,7 @@ module.exports = {
 
 					} else return res.json({
 						status: false,
-						err: "password-invalid"
+						err: "login-invalid"
 					})
 				} else res.json({
 					status: false,
@@ -164,16 +166,80 @@ module.exports = {
 				})
 			}
 		})
+	},
+
+	// Initate password reset
+	reset: (req, res) => {
+
+		// Validate input
+		let errs = [];
+
+		let email = isRequred(req.body, 'email');
+		if (email !== false) {
+			if (typeof(email) == 'string') {
+				if (!validator.isEmail(email)) errs.push({field: "email", err: "format"});
+			} else errs.push({field: "email", err: "type"})
+		} else errs.push({field: "email", err: "required"})
+
+		if (errs.length > 0) {
+			return res.json({
+				status: false,
+				err: errs
+			})
+		}
+
+		// Confirm user exists before carrying out the update
+		agents.findOne({email}, (err, agent) => {
+			if (!err) {
+				if (agent) {
+					let token = "1jvuy42342";
+					agents.updateOne({_id: agent._id}, {$set: {token, token_created: new Date()}}, (err, status) => {
+						if (!err) {
+							res.json({
+								status: true
+							})
+						} else {
+							log(err);
+							res.json({
+								status: false
+							})
+						}
+					});
+				} else {
+					res.json({
+						status: false,
+						err: "email-not-found"
+					})
+				}
+			} else {
+				log(err);
+				res.json({
+					status: false
+				})
+			}
+		})
 	}
 }
 
 
-// Internal function for checking if password is set.
-function _isPasswordEmpty(token, callback){
-	agents.findOne({token, password: ""}, (err, result) => {
+// Returns Record if set, else return false.
+function _validateToken(token, callback){
+	agents.findOne({token}, (err, agent) => {
 		if (!err) {
-			if (result) callback(null, result._id);
-			else callback(null, false);
+			if (agent) {
+
+				// Check if the token is still valid
+				let currentTime = new Date().getTime();
+                let tokenCreated = new Date(agent['token_created']).getTime();
+
+                if (((currentTime - tokenCreated) / 1000) < appConst.AGENT_PASSWORD_RESET_LIMIT) {
+                	callback(null, agent._id);
+                } else { 
+                	callback("Token expired");
+                }
+			} else {
+				callback(`token was not found`);
+			}
 		} else {
 			log(err);
 			callback("Unable to check password status.");

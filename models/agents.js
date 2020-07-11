@@ -8,8 +8,9 @@ const _schema = new Schema({
 	fname: String,
 	lname: String,
 	password: String,
-	roles: Array,
+	categories: Array,
 	token: String,
+	token_created: Date,
 	updated: Date,
 	created: { type: Date, default: Date.now}
 });

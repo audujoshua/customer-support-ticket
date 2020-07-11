@@ -6,5 +6,6 @@ module.exports = {
     ADMIN_PASS: "password",
     ADMIN_ID: "nb3yg743493",
 
-    USER_LOGIN_TOKEN_LIMIT: 300
+    USER_LOGIN_TOKEN_LIMIT: 300,
+    AGENT_PASSWORD_RESET_LIMIT: 300,
 }

@@ -107,9 +107,9 @@ module.exports = {
 
 					// Check if the token is still valid
 					let currentTime = new Date().getTime();
-	                let tokenExp = new Date(user['token_created']).getTime();
+	                let tokenCreated = new Date(user['token_created']).getTime();
 
-	                if ((currentTime - tokenExp) > appConst.USER_LOGIN_TOKEN_LIMIT) {
+	                if ((currentTime - tokenCreated) < appConst.USER_LOGIN_TOKEN_LIMIT) {
 
 	                	// Create session
 	                   	createSession(user._id, (sessionId) => {

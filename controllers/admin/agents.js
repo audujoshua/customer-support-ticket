@@ -26,10 +26,10 @@ module.exports = {
 			if (typeof(lname) !== 'string') errs.push({field: "lname", err: "type"})
 		} else errs.push({field: "lname", err: "required"});
 
-		let roles = isRequred(req.body, 'roles');
-		if (roles !== false) {
-			if (typeof(roles) !== 'object') errs.push({field: "roles", err: "type"})
-		} else errs.push({field: "roles", err: "required"})
+		let categories = isRequred(req.body, 'categories');
+		if (categories !== false) {
+			if (typeof(categories) !== 'object') errs.push({field: "categories", err: "type"})
+		} else errs.push({field: "categories", err: "required"})
 
 		if (errs.length > 0) {
 			return res.json({
@@ -45,7 +45,7 @@ module.exports = {
 			email,
 			fname,
 			lname,
-			roles
+			categories
 		})
 		newAgent.save((err, result) => {
 			if (!err) {
