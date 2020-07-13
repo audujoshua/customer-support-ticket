@@ -1,6 +1,7 @@
 const validator = require('validator');
 const isRequred = require('../../components/is-required');
 const agents = require('../../models/agents');
+const ticketCategories = require("../../components/ticket-categories");
 
 module.exports = {
 
@@ -28,7 +29,15 @@ module.exports = {
 
 		let categories = isRequred(req.body, 'categories');
 		if (categories !== false) {
-			if (typeof(categories) !== 'object') errs.push({field: "categories", err: "type"})
+			if (typeof(categories) === 'object') {
+				if ((categories.length > 0) && (categories.length <= ticketCategories.length)) {
+
+					// confirm that categories are valid
+					let match = ticketCategories.filter(t => categories.indexOf(t.id) != -1);
+					if (match.length != categories.length) errs.push({field: "category", err: "invalid"})
+						
+				} else errs.push({field: "categories", err: "invalid"})				
+			} else errs.push({field: "categories", err: "type"})
 		} else errs.push({field: "categories", err: "required"})
 
 		if (errs.length > 0) {
@@ -51,7 +60,9 @@ module.exports = {
 			if (!err) {
 				res.json({
 					status: true,
-					data: result
+					data: {
+						id: result._id
+					}
 				})
 			} else {
 				log(err);

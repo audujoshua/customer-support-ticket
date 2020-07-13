@@ -2,6 +2,8 @@ const validator = require('validator');
 const users = require("../../models/users");
 const isRequred = require('../../components/is-required');
 const appConst = require("../../components/constants");
+const crypto = require('crypto');
+const randomStr = require('../../components/random-str');
 const {checkHeader, createSession} = require('../../components/session');
 
 module.exports = {
@@ -28,7 +30,8 @@ module.exports = {
 		}
 
 		// If user exists on the system, send a login link, otherwise create the user
-		let token = _createLoginToken(email);
+		let secret = randomStr() + email;
+		let token = crypto.createHash('md5').update(secret).digest("hex");
 		users.findOne({email}, (err, user) => {
 			if (!err) {
 				if (!user) {
@@ -43,7 +46,7 @@ module.exports = {
 						if (!err) {
 							res.json({
 								status: true,
-								data: token
+								data: {token}
 							})
 						} else {
 							log(err);
@@ -109,14 +112,16 @@ module.exports = {
 					let currentTime = new Date().getTime();
 	                let tokenCreated = new Date(user['token_created']).getTime();
 
-	                if ((currentTime - tokenCreated) < appConst.USER_LOGIN_TOKEN_LIMIT) {
+	                if (((currentTime - tokenCreated) / 1000) < appConst.USER_LOGIN_TOKEN_LIMIT) {
 
 	                	// Create session
 	                   	createSession(user._id, (sessionId) => {
 							if(sessionId != false) {
 								return res.json({
 												status: true,
-												data: sessionId
+												data: {
+													token: sessionId
+												}
 											})
 							}
 							else return res.json({
@@ -146,10 +151,4 @@ module.exports = {
 			}
 		})
 	}
-}
-
-
-// Creates a login token for the user; combining the user email and ID
-function _createLoginToken(userEmail){
-	return "1234";
 }

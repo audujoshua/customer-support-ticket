@@ -4,6 +4,8 @@ const isRequred = require('../../components/is-required');
 const hasher = require('../../components/hash.js');
 const appConst = require('../../components/constants');
 const {checkHeader, createSession} = require('../../components/session');
+const crypto = require('crypto');
+const randomStr = require('../../components/random-str');
 
 
 module.exports = {
@@ -60,7 +62,7 @@ module.exports = {
 				log(token + " " + err);
 				res.json({
 					status: false,
-					err: "invalid-token"
+					err
 				})
 			}
 		})
@@ -72,8 +74,10 @@ module.exports = {
 		// Validate input
 		let errs = [];
 
-		let token = req.params.token;
-		if (typeof(token) !== 'string') errs.push({field: "token", err: "type"})
+		let token = isRequred(req.body, 'token');
+		if (token !== false){
+			if (typeof(token) !== 'string') errs.push({field: "token", err: "type"})
+		} else errs.push({field: "token", err: "required"});
 
 		if (errs.length > 0) {
 			return res.json({
@@ -132,14 +136,18 @@ module.exports = {
 							if(userSessionData != false){
 								return res.json({
 											status: true,
-											data: userSessionData._id
+											data: {
+												token: userSessionData._id
+											}
 										})
 							} else {
 								createSession(agent._id, (sessionId) => {
 									if(sessionId != false) {
 										return res.json({
 														status: true,
-														data: sessionId
+														data: {
+															token: sessionId
+														}
 													})
 									}
 									else return res.json({
@@ -192,11 +200,15 @@ module.exports = {
 		agents.findOne({email}, (err, agent) => {
 			if (!err) {
 				if (agent) {
-					let token = "1jvuy42342";
+					let secret = randomStr() + email;
+					let token = crypto.createHash('md5').update(secret).digest("hex");
 					agents.updateOne({_id: agent._id}, {$set: {token, token_created: new Date()}}, (err, status) => {
 						if (!err) {
 							res.json({
-								status: true
+								status: true,
+								data: {
+									token
+								}
 							})
 						} else {
 							log(err);
@@ -235,14 +247,14 @@ function _validateToken(token, callback){
                 if (((currentTime - tokenCreated) / 1000) < appConst.AGENT_PASSWORD_RESET_LIMIT) {
                 	callback(null, agent._id);
                 } else { 
-                	callback("Token expired");
+                	callback("token-expired");
                 }
 			} else {
-				callback(`token was not found`);
+				callback(`token-not-found`);
 			}
 		} else {
-			log(err);
-			callback("Unable to check password status.");
+			log(err + " - Unable to check password status.");
+			callback("error");
 		}
 	})
 }

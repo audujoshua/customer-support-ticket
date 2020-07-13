@@ -30,7 +30,7 @@ module.exports = {
 		if (email !== appConst.ADMIN_USERNAME || password !== appConst.ADMIN_PASS) {
 			return res.json({
 						status: false,
-						err: "login-failed"
+						err: "invalid-login"
 					})
 		}
 
@@ -50,8 +50,7 @@ module.exports = {
 									})
 					}
 					else return res.json({
-						status: false,
-						msg: "Unable to register session."
+						status: false
 					})
 				})
 			}

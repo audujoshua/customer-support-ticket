@@ -6,7 +6,7 @@ const port = process.env.PORT || 2300;
 const mongoose = require('mongoose');
 const SimpleNodeLogger = require('simple-node-logger');
 const bodyParser = require('body-parser');
-
+const path = require('path');
 
 // Cors. Ensure that it is placed before any call most especially the static file definition. As a static file could be processed
 // before the CORS header is processed if placed afterwards.
@@ -29,6 +29,7 @@ mongoose.connect('mongodb+srv://fliqpay-ticket-system:3JgBqiPt8zAa3Eg@cluster0.z
 // Configure
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Err log
 const log = SimpleNodeLogger.createSimpleLogger({
@@ -49,17 +50,7 @@ app.use(function (err, req, res, next) {
 			status: false,
 			err: 'login-required.'
 		})
-	} else if(err == 'registration-required'){
-		res.json({
-			status: false,
-			err: 'registration-required'
-		})
-	} else if(err == 'app-error'){
-		res.json({
-			status: false,
-			err: 'app-error'
-		})
-	} else next(err); 
+	}  else next(err); 
 })
 
 

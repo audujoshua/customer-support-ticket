@@ -43,7 +43,9 @@ module.exports = {
 			if (!err) {
 				res.json({
 					status: true,
-					data: ticket._id
+					data: {
+						id: ticket._id
+					}
 				})
 			} else {
 				log(err);

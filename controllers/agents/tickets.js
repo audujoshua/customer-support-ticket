@@ -168,6 +168,24 @@ module.exports = {
 				})
 			}
 		})
+	},
 
+	// Fetch Open tickets
+	getOpenTickets: (req, res) => {
+		tickets.find({agent_id: null}, (err, result) => {
+			if (!err) {
+				res.json({
+					status: true,
+					data: {
+						tickets: result
+					}
+				})
+			} else {
+				log(err);
+				res.json({
+					status: false
+				})
+			}
+		})
 	}
 }
