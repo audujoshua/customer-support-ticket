@@ -45,8 +45,10 @@ app.use(require('./routes'));
 
 // Error Handling middleware. Err passed from sessions, etc ... middleware.
 app.use(function (err, req, res, next) {
-	if (err == 'login-required') {
-		res.status(401).json({
+	if (err instanceof SyntaxError && 'body' in err) {
+        return res.status(400).send({ status: false, message: err.message });
+    } else if (err == 'login-required') {
+		return res.status(401).json({
 			status: false,
 			err: 'login-required.'
 		})
