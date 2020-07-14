@@ -101,7 +101,6 @@ module.exports = {
 
 	// Fetch tickets
 	fetch: (req, res) => {
-		console.log(req.app.locals.userId);
 		tickets.find({user_id: req.app.locals.userId}, (err, result) => {
 			if (!err) {
 

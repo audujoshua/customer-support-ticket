@@ -1,7 +1,7 @@
 const validator = require('validator');
 const {checkHeader, createSession} = require('../../components/session');
 const isRequred = require('../../components/is-required');
-const appConst = require ('../../components/constants');
+const randomStr = require('../../components/random-str');
 
 module.exports = {
 	login: (req, res) => {
@@ -27,7 +27,7 @@ module.exports = {
 		}
 
 		// Verify Login details
-		if (email !== appConst.ADMIN_USERNAME || password !== appConst.ADMIN_PASS) {
+		if (email !== process.env.ADMIN_EMAIL || password !== process.env.ADMIN_PASS) {
 			return res.json({
 						status: false,
 						err: "invalid-login"
@@ -35,7 +35,8 @@ module.exports = {
 		}
 
 		// If the request comes with a header, check it's validity and continue with session
-		createSession(appConst.ADMIN_ID, (sessionId) => {
+		let admin_id = randomStr();
+		createSession(admin_id, (sessionId) => {
 			if(sessionId != false) {
 				return res.json({
 								status: true,

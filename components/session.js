@@ -17,10 +17,10 @@ function hasSession(req, res, next){
 
 // Check if the header sent is valid
 function checkHeader(req, callBack){
-    let cookie  = req.header(appConst.SESSION_HEADER);    
-    if (cookie) {
-        if (jwt.verify(cookie)) {
-            let d = jwt.decode(cookie);
+    let hdr  = req.header(appConst.SESSION_HEADER);    
+    if (hdr) {
+        if (jwt.verify(hdr)) {
+            let d = jwt.decode(hdr);
             callBack({
                 user_id: d.payload.user_id
             })

@@ -23,7 +23,7 @@ app.use(function(req, res, next) {
 
 
 // Connect to database
-mongoose.connect('mongodb+srv://fliqpay-ticket-system:3JgBqiPt8zAa3Eg@cluster0.znh7p.mongodb.net/test?retryWrites=true&w=majority', { useNewUrlParser: true, useCreateIndex: true } );
+mongoose.connect(`mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASS}@${process.env.DB_URL}/test?retryWrites=true&w=majority`, { useNewUrlParser: true, useCreateIndex: true } );
 
 
 // Configure
