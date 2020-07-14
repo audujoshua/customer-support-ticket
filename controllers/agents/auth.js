@@ -132,30 +132,19 @@ module.exports = {
 					if (agent.password == hasher(password)) {
 
 						// If the request comes with a header, check it's validity and continue with session
-						checkHeader(req, (userSessionData) => {
-							if(userSessionData != false){
+						createSession(agent._id, (sessionId) => {
+							if(sessionId != false) {
 								return res.json({
-											status: true,
-											data: {
-												token: userSessionData._id
-											}
-										})
-							} else {
-								createSession(agent._id, (sessionId) => {
-									if(sessionId != false) {
-										return res.json({
-														status: true,
-														data: {
-															token: sessionId
-														}
-													})
-									}
-									else return res.json({
-										status: false,
-										msg: "Unable to register session."
-									})
-								})
+												status: true,
+												data: {
+													token: sessionId
+												}
+											})
 							}
+							else return res.json({
+								status: false,
+								msg: "Unable to register session."
+							})
 						})
 
 					} else return res.json({

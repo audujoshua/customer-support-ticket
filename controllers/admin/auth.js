@@ -35,25 +35,18 @@ module.exports = {
 		}
 
 		// If the request comes with a header, check it's validity and continue with session
-		checkHeader(req, (userSessionData) => {
-			if(userSessionData != false){
+		createSession(appConst.ADMIN_ID, (sessionId) => {
+			if(sessionId != false) {
 				return res.json({
-							status: true,
-							data: userSessionData._id
-						})
-			} else {
-				createSession(appConst.ADMIN_ID, (sessionId) => {
-					if(sessionId != false) {
-						return res.json({
-										status: true,
-										data: sessionId
-									})
-					}
-					else return res.json({
-						status: false
-					})
-				})
+								status: true,
+								data: {
+									token: sessionId
+								}
+							})
 			}
+			else return res.json({
+				status: false
+			})
 		})
 	}
 }
