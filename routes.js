@@ -18,6 +18,7 @@ router.post('/user/auth/init', users.auth.init);
 router.post('/user/auth/confirm', users.auth.login);
 router.post('/user/tickets', hasSession, users.tickets.open);
 router.post('/user/ticket/:ticket_id/comment', hasSession, users.tickets.addComment);
+router.get('/user/tickets', hasSession, users.tickets.fetch);
 
 // Agent Routes
 router.post('/agent/auth/reset', agents.auth.reset);

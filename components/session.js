@@ -22,7 +22,7 @@ function checkHeader(req, callBack){
         if (jwt.verify(cookie)) {
             let d = jwt.decode(cookie);
             callBack({
-                user_id: d.user_id
+                user_id: d.payload.user_id
             })
         } else callBack(false);
     } else callBack(false);

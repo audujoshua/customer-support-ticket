@@ -97,6 +97,46 @@ module.exports = {
 				})
 			}
 		})
+	},
 
+	// Fetch tickets
+	fetch: (req, res) => {
+		console.log(req.app.locals.userId);
+		tickets.find({user_id: req.app.locals.userId}, (err, result) => {
+			if (!err) {
+
+				// process the result to set the status.
+				let status = 'open';
+				let data = result.map(r => {
+
+					if (r['date_assigned']) status = 'assigned';
+					if (r['date_closed']) status = 'closed';
+
+					return {
+						id: r._id,
+						text: r.text,
+						category: r.category,
+						comments: r.comments,
+						created: r.created,
+						agent_id: r.agent_id,
+						date_assigned: r.date_assigned,
+						status: status
+					}
+				})
+
+				// send response
+				res.json({
+					status: true,
+					data: {
+						tickets: data
+					}
+				})
+			} else {
+				log(err);
+				res.json({
+					status: false
+				})
+			}
+		})
 	}
 }
