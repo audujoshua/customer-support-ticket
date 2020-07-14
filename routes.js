@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {hasSession} = require('./components/session');
+const {hasUserSession, hasAgentSession, hasAdminSession} = require('./components/session');
 
 // Controllers
 const admin = require('./controllers/admin/index.js');
@@ -16,21 +16,21 @@ router.get('/', (req, res) => {res.json({msg: "Customer Ticket Support System - 
 // User Routes
 router.post('/user/auth/init', users.auth.init);
 router.post('/user/auth/confirm', users.auth.login);
-router.post('/user/tickets', hasSession, users.tickets.open);
-router.post('/user/ticket/:ticket_id/comment', hasSession, users.tickets.addComment);
-router.get('/user/tickets', hasSession, users.tickets.fetch);
+router.post('/user/tickets', hasUserSession, users.tickets.open);
+router.post('/user/ticket/:ticket_id/comment', hasUserSession, users.tickets.addComment);
+router.get('/user/tickets', hasUserSession, users.tickets.fetch);
 
 // Agent Routes
 router.post('/agent/auth/reset', agents.auth.reset);
 router.post('/agent/auth', agents.auth.updatePassword);
 router.post('/agent/auth/token', agents.auth.checkToken);
 router.post('/agent/auth/login', agents.auth.login);
-router.put('/agent/ticket/:ticket_id/rep', hasSession, agents.tickets.claim);
-router.post('/agent/ticket/:ticket_id/comment', hasSession, agents.tickets.addComment);
-router.put('/agent/ticket/:ticket_id/close', hasSession, agents.tickets.close);
-router.get('/agent/tickets/open', hasSession, agents.tickets.getOpenTickets);
+router.put('/agent/ticket/:ticket_id/rep', hasAgentSession, agents.tickets.claim);
+router.post('/agent/ticket/:ticket_id/comment', hasAgentSession, agents.tickets.addComment);
+router.put('/agent/ticket/:ticket_id/close', hasAgentSession, agents.tickets.close);
+router.get('/agent/tickets/open', hasAgentSession, agents.tickets.getOpenTickets);
 
 // Admin Routes
 router.post('/admin/login', admin.auth.login);
-router.post('/admin/agents', hasSession, admin.agents.register);
-router.post('/admin/tickets/report', hasSession, admin.tickets.generateReport);
+router.post('/admin/agents', hasAdminSession, admin.agents.register);
+router.post('/admin/tickets/report', hasAdminSession, admin.tickets.generateReport);

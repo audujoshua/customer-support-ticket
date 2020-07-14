@@ -4,9 +4,30 @@ const jwt = require('./jwt');
 
 //////////// Session middleware to validate that a request comes with a valid session  //////////////
 
-function hasSession(req, res, next){
+// For users
+function hasUserSession(req, res, next){
     checkHeader(req, (userSessionData) => {
-        if(userSessionData != false){
+        if(userSessionData != false && userSessionData.role === "user"){
+            req.app.locals.userId = userSessionData.user_id;
+            next();
+        }else next('login-required')
+    })
+}
+
+// For Agents
+function hasAgentSession(req, res, next){
+    checkHeader(req, (userSessionData) => {
+        if(userSessionData != false && userSessionData.role === "agent"){
+            req.app.locals.userId = userSessionData.user_id;
+            next();
+        }else next('login-required')
+    })
+}
+
+// For Admin
+function hasAdminSession(req, res, next){
+    checkHeader(req, (userSessionData) => {
+        if(userSessionData != false && userSessionData.role === "user"){
             req.app.locals.userId = userSessionData.user_id;
             next();
         }else next('login-required')
@@ -22,7 +43,8 @@ function checkHeader(req, callBack){
         if (jwt.verify(hdr)) {
             let d = jwt.decode(hdr);
             callBack({
-                user_id: d.payload.user_id
+                user_id: d.payload.user_id,
+                role: d.payload.role
             })
         } else callBack(false);
     } else callBack(false);
@@ -30,11 +52,13 @@ function checkHeader(req, callBack){
 
 
 // Create a new session for user
-function createSession(userId, callBack){
-    callBack(jwt.sign({user_id: userId}));
+function createSession(userId, role, callBack){
+    callBack(jwt.sign({user_id: userId, role}));
 }
 
 
-module.exports.hasSession = hasSession;
+module.exports.hasUserSession = hasUserSession;
+module.exports.hasAgentSession = hasAgentSession;
+module.exports.hasAdminSession = hasAdminSession;
 module.exports.checkHeader = checkHeader;
 module.exports.createSession = createSession;

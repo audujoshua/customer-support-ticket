@@ -36,7 +36,7 @@ module.exports = {
 
 		// If the request comes with a header, check it's validity and continue with session
 		let admin_id = randomStr();
-		createSession(admin_id, (sessionId) => {
+		createSession(admin_id, 'admin', (sessionId) => {
 			if(sessionId != false) {
 				return res.json({
 								status: true,

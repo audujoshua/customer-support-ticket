@@ -115,7 +115,7 @@ module.exports = {
 	                if (((currentTime - tokenCreated) / 1000) < appConst.USER_LOGIN_TOKEN_LIMIT) {
 
 	                	// Create session
-	                   	createSession(user._id, (sessionId) => {
+	                   	createSession(user._id, 'user', (sessionId) => {
 							if(sessionId != false) {
 								return res.json({
 												status: true,

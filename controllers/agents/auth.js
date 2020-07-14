@@ -132,7 +132,7 @@ module.exports = {
 					if (agent.password == hasher(password)) {
 
 						// If the request comes with a header, check it's validity and continue with session
-						createSession(agent._id, (sessionId) => {
+						createSession(agent._id, 'agent', (sessionId) => {
 							if(sessionId != false) {
 								return res.json({
 												status: true,

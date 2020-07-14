@@ -8,8 +8,7 @@ const SimpleNodeLogger = require('simple-node-logger');
 const bodyParser = require('body-parser');
 const path = require('path');
 
-// Cors. Ensure that it is placed before any call most especially the static file definition. As a static file could be processed
-// before the CORS header is processed if placed afterwards.
+// Cors. 
 app.use(function(req, res, next) {
 
     res.header("Access-Control-Allow-Origin", '*');
@@ -23,7 +22,7 @@ app.use(function(req, res, next) {
 
 
 // Connect to database
-mongoose.connect(`mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASS}@${process.env.DB_URL}/test?retryWrites=true&w=majority`, { useNewUrlParser: true, useCreateIndex: true } );
+mongoose.connect(`mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASS}@${process.env.DB_URL}/mon?retryWrites=true&w=majority`, { useNewUrlParser: true, useCreateIndex: true } );
 
 
 // Configure
